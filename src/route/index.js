@@ -26,7 +26,9 @@ class Product {
 
   static getById = (id) =>
     this.#list.find((product) => product.id === id)
-
+  // static updateById = (id, data) => {
+  //   const product = this.getById(id)
+  // }
   static deleteById = (id) => {
     const index = this.#list.findIndex(
       (product) => product.id === id,
@@ -38,7 +40,7 @@ class Product {
       return false
     }
   }
-  static updateById = (id, data) => {
+  static updateById = (id, { data }) => {
     const product = this.getById(id)
     const { name, price } = data
 
