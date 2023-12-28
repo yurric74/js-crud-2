@@ -12,23 +12,38 @@ class Product {
     this.price = price
     this.description = description
     this.id = Math.floor(Math.random() * 100000)
-    this.createDate = () => {
-      this.date = new Date().toISOString()
-    }
+
+    //   this.createDate = () => {
+    //     this.date = new Date().toISOString()
+    //   }
   }
+  //============================================
+  //статичный метод, кот. будет возвращать массив #list
   static getList = () => this.#list
+  //============================================
 
-  checkId = (id) => this.id === id
+  //============================================
 
+  //============================================
+
+  //============================================
+  // статичный метод, кот. будет принимать уже
+  // созданный товар и сохранять его в частной
+  // переменной #list
   static add = (product) => {
     this.#list.push(product)
   }
+  //============================================
 
+  //============================================
   static getById = (id) =>
     this.#list.find((product) => product.id === id)
   // static updateById = (id, data) => {
   //   const product = this.getById(id)
   // }
+  //============================================
+
+  //============================================
   static deleteById = (id) => {
     const index = this.#list.findIndex(
       (product) => product.id === id,
@@ -40,19 +55,21 @@ class Product {
       return false
     }
   }
+  //============================================
+
+  //============================================
   static updateById = (id, { data }) => {
     const product = this.getById(id)
-    const { name, price } = data
+    const { price } = data
 
     if (product) {
-      if (name) {
-        product.name = name
-      } else if (price) {
+      if (price) {
         product.price = price
+
+        return true
+      } else {
+        return false
       }
-      return true
-    } else {
-      return false
     }
   }
 }
@@ -82,6 +99,12 @@ router.get('/product-create', function (req, res) {
   // ↙️ cюди вводимо назву файлу з сontainer
   res.render('product-create', {
     style: 'product-create',
+    data: {
+      products: {
+        list: getList(),
+        isEmpty: list.length === 0,
+      },
+    },
   })
 })
 
@@ -90,11 +113,17 @@ router.post('/product-create', function (req, res) {
   const product = new Product(name, price, description)
   Product.add(product)
   console.log(Product.getList())
-
-  res.render('alert', {
-    style: 'alert',
-    info: 'Товар успішно додано',
-  })
+  if (product) {
+    res.render('alert', {
+      style: 'alert',
+      info: 'Успішне виконання дії',
+    })
+  } else {
+    res.render('alert', {
+      style: 'alert',
+      info: 'Товар не доданий',
+    })
+  }
 })
 
 // =====================PRODUCT-LIST===========================================
@@ -142,14 +171,13 @@ router.get('/product-edit', function (req, res) {
   }
 })
 router.post('/product-edit', function (req, res) {
-  const { id, name, price, description } = req.body
-  const product = Product.updateById(Number(id), {
+  const { id, name, price } = req.body
+  const product = Product.updateById(
+    Number(id),
     name,
     price,
-    description,
-  })
-  console.log(id)
-  console.log(product)
+  )
+
   if (product) {
     res.render('alert', {
       style: 'alert',
